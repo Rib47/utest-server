@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.rib.gamemap.common.Constants.Game.FIELD_SIZE;
-import static org.rib.gamemap.common.Constants.Game.LOOK_SIZE;
 
 @Component
 public class PlayersMappingHelper {
@@ -41,11 +40,11 @@ public class PlayersMappingHelper {
     }
 
 
-    public List<Integer> getPlayerIdsForLookArea(int lookAreaTopX, int lookAreaTopY) {
+    public List<Integer> getPlayerIdsForLookArea(int lookAreaTopX, int lookAreaTopY, int lookAreaBottomX, int lookAreaBottomY) {
         int startSectionX = lookAreaTopX / SECTION_SIZE;
         int startSectionY = lookAreaTopY / SECTION_SIZE;
-        int endSectionX = (lookAreaTopX + LOOK_SIZE) / SECTION_SIZE;
-        int endSectionY = (lookAreaTopY + LOOK_SIZE) / SECTION_SIZE;
+        int endSectionX = lookAreaBottomX / SECTION_SIZE;
+        int endSectionY = lookAreaBottomY / SECTION_SIZE;
 
         return getPlayersIdsFromSector(startSectionX, startSectionY, endSectionX, endSectionY);
     }

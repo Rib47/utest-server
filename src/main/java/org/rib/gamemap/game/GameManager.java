@@ -11,10 +11,12 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static org.rib.gamemap.common.Constants.Game.PLAYERS_COUNT;
+import static org.rib.gamemap.common.Constants.Tasks.TASK_GENERATOR_PERIOD;
 
 @Component
 @Slf4j
 public class GameManager {
+
 
     private final long startTimeMs  = System.currentTimeMillis();
 
@@ -29,7 +31,7 @@ public class GameManager {
     @PostConstruct
     public void init() {
         regeneratePlayersOnMap(PLAYERS_COUNT);
-        scheduler.scheduleAtFixedRate(new TaskGenerator(), 1, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(new TaskGenerator(), 1, TASK_GENERATOR_PERIOD, TimeUnit.SECONDS);
     }
 
     private void regeneratePlayersOnMap(int playersCount) {
@@ -37,8 +39,9 @@ public class GameManager {
         playerStorage.clearAllData();
         for (int i = 0; i < playersCount; i++) {
             Player player = DataGenerator.generateNextRandomPlayer();
-            log.debug("Player generated: {}", player);
             saveNewPlayer(player);
+            player.getTaskList().generateNewTasks(DataGenerator.generateTasksCount());
+            log.debug("Player generated: {}", player);
         }
         printBigLogDelimiter();
     }
@@ -53,14 +56,22 @@ public class GameManager {
     public class TaskGenerator implements Runnable {
         @Override
         public void run() {
-            playerStorage.getPlayersMap().values().forEach((player) -> {
-                player.getTaskList().generateNewTaskUsingTimeout();
-            });
+            try {
+                playerStorage.getPlayersMap().values().forEach((player) -> {
+                    try {
+                        player.getTaskList().generateNewTaskUsingTimeout();
+                    } catch (Exception ex) {
+                        log.trace("Error message while generating new task: {}", ex.getMessage());
+                    }
+                });
 
-            log.debug("Tasks generated. Players list: ");
-            playerStorage.getPlayersMap().values()
-                    .forEach(player -> log.debug(playerStorage.toString()));
-            printBigLogDelimiter();
+                log.debug("Tasks generated. Players list: ");
+                playerStorage.getPlayersMap().values()
+                        .forEach(player -> log.debug(player.toString()));
+                printBigLogDelimiter();
+            } catch (Exception ex) {
+                log.trace("Error message: {}", ex.getMessage());
+            }
         }
     }
 
