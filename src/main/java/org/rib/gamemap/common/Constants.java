@@ -9,7 +9,7 @@ public final class Constants {
     public final class Game {
         public static final int FIELD_SIZE = 512;
         public static final int LOOK_SIZE = 32;
-        public static final int PLAYERS_COUNT = 20_000;
+        public static final int PLAYERS_COUNT = 10; // 20_000;
         public static final int TASKS_MAX_COUNT = 4;
 
     }
