@@ -26,4 +26,16 @@ public final class Constants {
         public static final int TASK_GENERATOR_PERIOD = 1;   // 1;
     }
 
+
+    @UtilityClass
+    public final class Rest {
+        public static final String VERSION = "/v1";
+
+        public static final String PLAYERS_PATH = "/players";
+        public static final String PLAYER_ID_PATH = "/{playerId}";
+        public static final String PLAYER_ID_PLACEHOLDER = "{playerId}";
+        public static final String PLAYER_TASK_PATH = PLAYERS_PATH + PLAYER_ID_PATH + "/tasks";
+    }
+
+
 }

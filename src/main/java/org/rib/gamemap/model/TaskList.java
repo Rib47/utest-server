@@ -30,20 +30,33 @@ public class TaskList {
     public void generateNewTaskUsingTimeout() {
         long currTime = System.currentTimeMillis() / 1000;
         clearFinishedTasks(currTime);
-        addTask(currTime, true);
+        addTaskUsingTimeout(currTime);
     }
 
-    // don't care about timeout, for external control
-    public void generateNewTasks(int count) {
+    /**
+     * don't care about timeout, for external control
+     *
+     * @param count
+     * @return count of really generated tasks
+     */
+    public int generateNewTasks(int count) {
+        if (count <= 0) {
+            return 0;
+        }
+
         long currTime = System.currentTimeMillis() / 1000;
         clearFinishedTasks(currTime);
-        for (int i = 0; i < count; i++) {
+        int tasksGenerated = 0;
+        for (int index = 0; index < TASKS_MAX_COUNT; index++) {
             if (freeTaskSlotsCount > 0) {
-                addTask(currTime, false);
-            } else {
-                return;
+                boolean success = addTask(currTime, index);
+                if (success)
+                    tasksGenerated++;
+                if (tasksGenerated == count)
+                    break;
             }
         }
+        return tasksGenerated;
     }
 
     // get current tasks
@@ -59,10 +72,10 @@ public class TaskList {
         freeTaskSlotsCount = TASKS_MAX_COUNT;
     }
 
-    private boolean addTask(final long currTime, final boolean useTimeout) {
+    private boolean addTaskUsingTimeout(final long currTime) {
         if (freeTaskSlotsCount > 0) {
             long timeAfterLastGeneration = currTime - lastGenerationTimeSec;
-            if ((!useTimeout) || (timeAfterLastGeneration >= taskGenerationTimeoutSec)) {
+            if (timeAfterLastGeneration >= taskGenerationTimeoutSec) {
                 long taskTime = DataGenerator.generateTaskTimeSec();
                 for (int taskIndex = 0; taskIndex < TASKS_MAX_COUNT; taskIndex++) {
                     if (tasks[taskIndex] == null) {
@@ -74,6 +87,18 @@ public class TaskList {
                     }
                 }
             }
+        }
+        return false;
+    }
+
+    private boolean addTask(final long currTime, final int taskIndex) {
+        if (tasks[taskIndex] == null) {
+            long taskTime = DataGenerator.generateTaskTimeSec();
+            long taskEndTime =  currTime + taskTime;
+            createTask(taskIndex, taskEndTime);
+            freeTaskSlotsCount--;
+            lastGenerationTimeSec = currTime;
+            return true;
         }
         return false;
     }

@@ -6,6 +6,7 @@ import org.rib.gamemap.model.Player;
 import java.util.Random;
 
 import static org.rib.gamemap.common.Constants.Game.FIELD_SIZE;
+import static org.rib.gamemap.common.Constants.Game.PLAYERS_COUNT;
 import static org.rib.gamemap.common.Constants.Tasks.TASKS_MAX_COUNT;
 import static org.rib.gamemap.common.Constants.Tasks.TASK_MAX_TIMEOUT_SEC;
 import static org.rib.gamemap.common.Constants.Tasks.TASK_MAX_TIME_SEC;
@@ -32,6 +33,11 @@ public final class DataGenerator {
 
     public static int generateTasksCount() {
         return 1 + random.nextInt(TASKS_MAX_COUNT);
+    }
+
+
+    public static int generateRandomPlayersOffset(int limitCount) {
+        return 1 + random.nextInt(PLAYERS_COUNT - limitCount);
     }
 
 }
